@@ -10,6 +10,10 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U saam_admin -d employee_management"]
+      interval: 5s
+      retries: 5
 
   backend:
     build:
@@ -27,7 +31,8 @@ services:
       FRONTEND_PORT: 8081
       SPRING_FLYWAY_ENABLED: true
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
 
   frontend:
     build:
